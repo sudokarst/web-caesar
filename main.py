@@ -16,20 +16,21 @@ def is_integer(s):
 def index():
     rot = 0
     rot_error = ''
-    text = PLAINTEXT
+    placeholder = PLAINTEXT
     return render_template("index.html", **locals())
 
 @app.route("/", methods=['POST'])
 def encrypt():
+    placeholder = PLAINTEXT
     rot = request.form['rot']
     text = request.form['text']
     if is_integer(rot):
         rot = int(rot)
-        if not text.strip():
-            text = PLAINTEXT
-        else:
+        if text.strip():
             text = rotate_string(text, rot)
             rot = (26 - (rot % 26) ) % 26
+        else:
+            text = ''
     else:
         rot_error = "must be an integer" 
     return render_template("index.html", **locals())
