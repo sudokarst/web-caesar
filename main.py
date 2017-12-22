@@ -14,7 +14,7 @@ def is_integer(s):
 
 @app.route("/")
 def index():
-    rot = 13
+    rot = 0
     rot_error = ''
     text = PLAINTEXT
     return render_template("index.html", **locals())
@@ -29,7 +29,7 @@ def encrypt():
             text = PLAINTEXT
         else:
             text = rotate_string(text, rot)
-            rot = 26 - (rot % 26)
+            rot = (26 - (rot % 26) ) % 26
     else:
         rot_error = "must be an integer" 
     return render_template("index.html", **locals())
