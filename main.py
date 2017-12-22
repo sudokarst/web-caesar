@@ -1,54 +1,38 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 from caesar import rotate_string
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
-form = """
-<!DOCTYPE html>
-
-<html>
-    <head>
-        <style>
-            form {{
-                background-color: #eee;
-                padding: 20px;
-                margin: 0 auto;
-                width: 540px;
-                font: 16px sans-serif;
-                border-radius: 10px;
-            }}
-            textarea {{
-                margin: 10px 0;
-                width: 540px;
-                height: 120px;
-            }}
-        </style>
-    </head>
-    <body>
-        <form method="POST">
-            <label for="rotate-by">Rotate by:<label>
-            <input id="rotate-by" type="text" name="rot" value="{rot}">
-            <textarea name="text">{text}</textarea>
-            <input type="submit" value="submit">
-        </form>
-    </body>
-</html>
-"""
+PLAINTEXT = "Your plaintext secret here . . ."
+def is_integer(s):
+    try:
+        x = int(s)
+    except ValueError:
+        return False
+    return True
 
 @app.route("/")
 def index():
-    rot = 0
-    text = "Your plaintext secret here . . ."
-    return form.format(**locals())
+    rot = 13
+    rot_error = ''
+    text = PLAINTEXT
+    return render_template("index.html", **locals())
 
 @app.route("/", methods=['POST'])
 def encrypt():
-    rot = int(request.form['rot'])
+    rot = request.form['rot']
     text = request.form['text']
-    text = rotate_string(text, rot)
-    rot = 26 - (rot % 26)
-    return form.format(**locals())
+    if is_integer(rot):
+        rot = int(rot)
+        if not text.strip():
+            text = PLAINTEXT
+        else:
+            text = rotate_string(text, rot)
+            rot = 26 - (rot % 26)
+    else:
+        rot_error = "must be an integer" 
+    return render_template("index.html", **locals())
 
 
 app.run()
